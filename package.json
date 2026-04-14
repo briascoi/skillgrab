@@ -1,0 +1,49 @@
+{
+  "name": "skillgrab",
+  "version": "0.1.0",
+  "description": "Scan any project and auto-install matching AI skills from skills.sh.",
+  "type": "module",
+  "bin": {
+    "skillgrab": "./dist/cli.js",
+    "autoskills": "./dist/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/briascoi/skillgrab.git"
+  },
+  "homepage": "https://github.com/briascoi/skillgrab#readme",
+  "bugs": {
+    "url": "https://github.com/briascoi/skillgrab/issues"
+  },
+  "author": "briascoi",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "skills",
+    "claude",
+    "cli",
+    "scaffolding"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.7.0",
+    "picocolors": "^1.0.1",
+    "yaml": "^2.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0"
+  }
+}

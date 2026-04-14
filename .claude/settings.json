@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(node /Users/Ismael/Dev/autoskills/dist/cli.js --dry-run --yes)"
+    ]
+  }
+}
