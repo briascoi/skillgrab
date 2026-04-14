@@ -6,6 +6,7 @@ import * as p from "@clack/prompts";
 import { detect } from "./detect/index.js";
 import { searchRegistry, scoreSkill } from "./registry/search.js";
 import type { ApiSkill } from "./registry/search.js";
+import { filterValid } from "./registry/validate.js";
 import { banner, info, ok, planTable, section, warn, err } from "./ui.js";
 import { confirmAreas, pickSkills } from "./prompt.js";
 import { installAll } from "./install.js";
@@ -167,8 +168,17 @@ async function main() {
 
   const planSpinner = args.json ? null : p.spinner();
   planSpinner?.start("Querying skills.sh");
-  const candidates = await buildPlan(result.signals, acceptedHints);
-  planSpinner?.stop(`Found ${candidates.length} matching skill${candidates.length === 1 ? "" : "s"}`);
+  const rawCandidates = await buildPlan(result.signals, acceptedHints);
+  planSpinner?.stop(`Found ${rawCandidates.length} matching skill${rawCandidates.length === 1 ? "" : "s"}`);
+
+  const verifySpinner = args.json ? null : p.spinner();
+  verifySpinner?.start("Verifying skills exist on GitHub");
+  const { valid: candidates, invalid } = await filterValid(rawCandidates);
+  verifySpinner?.stop(
+    invalid.length > 0
+      ? `Verified ${candidates.length} · dropped ${invalid.length} stale entries`
+      : `Verified ${candidates.length} skills`,
+  );
 
   if (args.json) {
     console.log(JSON.stringify({ detect: result, acceptedHints, plan: candidates }, null, 2));
