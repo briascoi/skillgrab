@@ -1,5 +1,7 @@
 import { spawn } from "node:child_process";
 
+const AGENT = process.env.SKILLGRAB_AGENT ?? "claude-code";
+
 /**
  * Split a skills.sh slug into (repo, skillId).
  * skills.sh returns `owner/repo/skillId` but `npx skills add` expects
@@ -13,13 +15,7 @@ export function parseSlug(slug: string): { source: string; skillId: string | nul
   return { source: slug, skillId: null };
 }
 
-const AGENT = process.env.SKILLGRAB_AGENT ?? "claude-code";
-
-export function installOne(slug: string): Promise<number> {
-  const { source, skillId } = parseSlug(slug);
-  const args = ["skills", "add", source, "--yes", "--global", "--agent", AGENT];
-  if (skillId) args.push("--skill", skillId);
-
+function run(args: string[]): Promise<number> {
   return new Promise((resolve) => {
     const proc = spawn("npx", args, { stdio: "inherit", env: process.env });
     proc.on("close", (code) => resolve(code ?? 1));
@@ -27,15 +23,25 @@ export function installOne(slug: string): Promise<number> {
   });
 }
 
+async function installGroup(source: string, skillIds: string[]): Promise<number> {
+  const args = ["skills", "add", source, "--yes", "--global", "--agent", AGENT];
+  for (const id of skillIds) args.push("--skill", id);
+  return run(args);
+}
+
+export async function installOne(slug: string): Promise<number> {
+  const { source, skillId } = parseSlug(slug);
+  if (!skillId) return run(["skills", "add", source, "--yes", "--global", "--agent", AGENT]);
+  return installGroup(source, [skillId]);
+}
+
 export async function installAll(slugs: string[]): Promise<{ slug: string; code: number }[]> {
-  // Group by source repo → install each repo once with --skill a,b,c
-  // (skills.sh clones the repo once per call; grouping avoids re-cloning).
+  // Group by source repo → one clone per repo, multiple --skill flags.
   const bySource = new Map<string, string[]>();
-  const nonGrouped: string[] = [];
   for (const slug of slugs) {
     const { source, skillId } = parseSlug(slug);
     if (!skillId) {
-      nonGrouped.push(slug);
+      if (!bySource.has(source)) bySource.set(source, []);
       continue;
     }
     if (!bySource.has(source)) bySource.set(source, []);
@@ -43,32 +49,15 @@ export async function installAll(slugs: string[]): Promise<{ slug: string; code:
   }
 
   const results: { slug: string; code: number }[] = [];
-
   for (const [source, skillIds] of bySource.entries()) {
-    const code = await runGroup(source, skillIds);
-    for (const id of skillIds) {
-      results.push({ slug: `${source}/${id}`, code });
+    const code = skillIds.length === 0
+      ? await run(["skills", "add", source, "--yes", "--global", "--agent", AGENT])
+      : await installGroup(source, skillIds);
+    if (skillIds.length === 0) {
+      results.push({ slug: source, code });
+    } else {
+      for (const id of skillIds) results.push({ slug: `${source}/${id}`, code });
     }
   }
-
-  for (const slug of nonGrouped) {
-    const code = await installOne(slug);
-    results.push({ slug, code });
-  }
-
   return results;
-}
-
-function runGroup(source: string, skillIds: string[]): Promise<number> {
-  const args = [
-    "skills", "add", source,
-    "--yes", "--global",
-    "--agent", AGENT,
-    "--skill", skillIds.join(","),
-  ];
-  return new Promise((resolve) => {
-    const proc = spawn("npx", args, { stdio: "inherit", env: process.env });
-    proc.on("close", (code) => resolve(code ?? 1));
-    proc.on("error", () => resolve(1));
-  });
 }
