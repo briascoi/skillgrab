@@ -24,6 +24,12 @@ export type DetectResult = {
 export type SkillCandidate = {
   /** skills.sh slug, e.g. "vercel-labs/agent-skills/find-skills". */
   slug: string;
+  /** Final skill name (last path segment). Used for dedupe. */
+  skillName: string;
+  /** Install count from skills.sh. */
+  installs: number;
+  /** Whether the source owner is in our trusted list. */
+  trusted: boolean;
   /** Why we picked it: originating signal or hint key. */
   reason: string;
 };

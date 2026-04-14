@@ -35,8 +35,15 @@ export function planTable(candidates: SkillCandidate[]) {
   }
   const maxSlug = Math.max(...candidates.map((c) => c.slug.length));
   for (const c of candidates) {
+    const star = c.trusted ? pc.yellow("★") : " ";
+    const installs = c.installs >= 1000
+      ? `${(c.installs / 1000).toFixed(1)}k`
+      : `${c.installs}`;
     console.log(
-      "  " + pc.cyan(c.slug.padEnd(maxSlug)) + pc.dim("  ← ") + pc.dim(c.reason),
+      "  " + star + " " +
+        pc.cyan(c.slug.padEnd(maxSlug)) +
+        pc.dim("  ← " + c.reason.padEnd(10)) +
+        pc.dim(installs.padStart(6) + " installs"),
     );
   }
 }

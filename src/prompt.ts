@@ -1,5 +1,5 @@
 import * as p from "@clack/prompts";
-import type { ContextHint } from "./types.js";
+import type { ContextHint, SkillCandidate } from "./types.js";
 
 export async function confirmAreas(hints: ContextHint[]): Promise<ContextHint[]> {
   if (hints.length === 0) return [];
@@ -23,10 +23,24 @@ function formatMatches(m: string[]): string {
   return `(${m.slice(0, 3).join(", ")})`;
 }
 
-export async function finalConfirm(count: number): Promise<boolean> {
-  const ok = await p.confirm({
-    message: `Install ${count} skill${count === 1 ? "" : "s"} now?`,
-    initialValue: true,
+export async function pickSkills(candidates: SkillCandidate[]): Promise<SkillCandidate[]> {
+  if (candidates.length === 0) return [];
+  const selected = await p.multiselect({
+    message: `Select skills to install (${candidates.length} suggested, all pre-selected):`,
+    options: candidates.map((c) => ({
+      value: c.slug,
+      label: `${c.trusted ? "★ " : "  "}${c.slug}`,
+      hint: `${c.reason} · ${formatInstalls(c.installs)}`,
+    })),
+    required: false,
+    initialValues: candidates.map((c) => c.slug),
   });
-  return ok === true;
+  if (p.isCancel(selected)) return [];
+  const set = new Set(selected as string[]);
+  return candidates.filter((c) => set.has(c.slug));
+}
+
+function formatInstalls(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k installs`;
+  return `${n} installs`;
 }

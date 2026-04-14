@@ -4,11 +4,17 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import * as p from "@clack/prompts";
 import { detect } from "./detect/index.js";
-import { searchRegistry } from "./registry/search.js";
+import { searchRegistry, scoreSkill } from "./registry/search.js";
+import type { ApiSkill } from "./registry/search.js";
 import { banner, info, ok, planTable, section, warn, err } from "./ui.js";
-import { confirmAreas, finalConfirm } from "./prompt.js";
+import { confirmAreas, pickSkills } from "./prompt.js";
 import { installAll } from "./install.js";
 import type { ContextHint, SkillCandidate, Signal } from "./types.js";
+
+const TRUSTED_OWNERS = new Set([
+  "anthropics","vercel","vercel-labs","supabase","stripe","clerk","openai",
+  "microsoft","github","google","googleworkspace","cloudflare","apify","openclaudia",
+]);
 
 type Args = {
   dryRun: boolean;
@@ -69,24 +75,47 @@ async function buildPlan(
   signals: Signal[],
   acceptedHints: ContextHint[],
 ): Promise<SkillCandidate[]> {
-  const seen = new Map<string, SkillCandidate>();
+  // Collect one candidate per (skill-name). If the same skill-name appears
+  // from multiple queries/sources, keep the highest-scored one.
+  const byName = new Map<string, { skill: ApiSkill; reason: string; score: number }>();
 
-  const addFromQueries = async (queries: string[], reason: string) => {
+  const collect = async (queries: string[], reason: string) => {
     for (const q of queries) {
-      const slugs = await searchRegistry(q, 2);
-      for (const slug of slugs) {
-        if (!seen.has(slug)) seen.set(slug, { slug, reason });
+      const skills = await searchRegistry(q, 1); // 1 per query is plenty
+      for (const s of skills) {
+        const score = scoreSkill(s);
+        const prev = byName.get(s.skillId);
+        if (!prev || score > prev.score) {
+          byName.set(s.skillId, { skill: s, reason, score });
+        }
       }
     }
   };
 
   for (const s of signals) {
-    await addFromQueries(s.queries, s.key);
+    await collect(s.queries, s.key);
   }
   for (const h of acceptedHints) {
-    await addFromQueries(h.queries, h.area);
+    await collect(h.queries, h.area);
   }
-  return [...seen.values()];
+
+  const out: SkillCandidate[] = [];
+  for (const { skill, reason } of byName.values()) {
+    const owner = skill.source.split("/")[0] ?? "";
+    out.push({
+      slug: skill.id,
+      skillName: skill.skillId,
+      installs: skill.installs,
+      trusted: TRUSTED_OWNERS.has(owner),
+      reason,
+    });
+  }
+  // Show trusted first, then by installs desc.
+  out.sort((a, b) => {
+    if (a.trusted !== b.trusted) return a.trusted ? -1 : 1;
+    return b.installs - a.installs;
+  });
+  return out;
 }
 
 async function main() {
@@ -160,14 +189,14 @@ async function main() {
     return;
   }
 
-  const go = args.yes ? true : await finalConfirm(candidates.length);
-  if (!go) {
+  const selected = args.yes ? candidates : await pickSkills(candidates);
+  if (selected.length === 0) {
     warn("Aborted.");
     return;
   }
 
   section("Installing");
-  const results = await installAll(candidates.map((c) => c.slug));
+  const results = await installAll(selected.map((c) => c.slug));
   console.log("");
   const failed = results.filter((r) => r.code !== 0);
   if (failed.length === 0) {

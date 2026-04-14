@@ -1,6 +1,6 @@
 {
   "name": "skillgrab",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Scan any project and auto-install matching AI skills from skills.sh.",
   "type": "module",
   "bin": {
