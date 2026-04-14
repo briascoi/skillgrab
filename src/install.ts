@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 
 export function installOne(slug: string): Promise<number> {
   return new Promise((resolve) => {
-    const proc = spawn("npx", ["skills", "add", slug], {
+    const proc = spawn("npx", ["skills", "add", slug, "--yes", "--global"], {
       stdio: "inherit",
       env: process.env,
     });
