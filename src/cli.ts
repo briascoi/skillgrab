@@ -7,6 +7,7 @@ import { detect } from "./detect/index.js";
 import { searchRegistry, scoreSkill } from "./registry/search.js";
 import type { ApiSkill } from "./registry/search.js";
 import { filterValid } from "./registry/validate.js";
+import { curatedFor } from "./registry/curated.js";
 import { detectAgents } from "./agents.js";
 import { banner, info, ok, planTable, section, warn, err } from "./ui.js";
 import { confirmAreas, pickSkills } from "./prompt.js";
@@ -152,6 +153,20 @@ async function buildPlan(
       trusted: TRUSTED_OWNERS.has(owner),
       reason,
     });
+  }
+
+  // Inject curated packs for detected signals (deduplicated against registry results).
+  const seenSlugs = new Set(out.map((c) => c.slug));
+  const seenNames = new Set(out.map((c) => c.skillName));
+  const curatedSlugs = new Set<string>();
+  for (const s of signals) {
+    for (const slug of curatedFor(s.key)) curatedSlugs.add(slug);
+  }
+  for (const slug of curatedSlugs) {
+    const parts = slug.split("/");
+    const skillName = parts.slice(2).join("/");
+    if (seenSlugs.has(slug) || seenNames.has(skillName)) continue;
+    out.push({ slug, skillName, installs: 0, trusted: false, reason: "essentials" });
   }
   // Show trusted first, then by installs desc.
   out.sort((a, b) => {
