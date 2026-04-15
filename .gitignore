@@ -4,3 +4,4 @@ dist
 *.log
 LAUNCH.md
 landing/demo.cast
+.claude/
