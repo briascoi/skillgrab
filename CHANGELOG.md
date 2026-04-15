@@ -1,0 +1,51 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [0.2.3] — 2026-04-15
+
+### Added
+- **GitHub validation step** before install. skills.sh sometimes returns `skillId` values that don't exist in the actual repo (stale / fuzzy matches). skillgrab now fetches the repo tree via GitHub API and drops candidates whose `<skillId>/SKILL.md` is missing. Detects plugin-nested structures like `<plugin>/skills/<id>/SKILL.md` (e.g. `anthropics/knowledge-work-plugins`).
+- Honors `GITHUB_TOKEN` env var to bypass 60/hr unauth limit.
+
+### Changed
+- Install step now shows "Verifying skills exist on GitHub" progress and reports dropped stale entries.
+
+## [0.2.2] — 2026-04-15
+
+### Fixed
+- The `skills` CLI does not accept `--skill a,b,c` (comma-separated) — it treats it as one literal name. Now passes repeated `--skill` flags per skill, so multiple skills from one repo install correctly with a single clone.
+
+## [0.2.1] — 2026-04-15
+
+### Fixed
+- Pass `owner/repo` as the source and `--skill <skillId>` as a flag, instead of the full `owner/repo/skillId` slug as source. Previous version caused "No skills found" because the installer cloned the repo and looked for `SKILL.md` at root.
+- Added `--agent claude-code` default (configurable via `SKILLGRAB_AGENT`) so the installer doesn't flood stdout with EACCES errors from ~40 unrelated agent directories.
+
+## [0.2.0] — 2026-04-14
+
+### Added
+- **Ranking** — trusted-owner boost + `log10(installs)` score. Trusted owners marked with ★ in the plan: anthropics, vercel, vercel-labs, supabase, stripe, clerk, openai, microsoft, github, google, googleworkspace, cloudflare, apify, openclaudia.
+- **Dedupe by final skill name** across queries (keeps highest-scored) — prevents two `copywriting` skills from different repos overwriting each other.
+- **Interactive multi-select picker** at the final step — all skills pre-selected; user can uncheck before installing.
+- Plan table shows ★ trusted badge and install count.
+
+### Changed
+- 1 skill per query (was 2) to reduce noise.
+
+## [0.1.1] — 2026-04-14
+
+### Fixed
+- skills.sh is a Next.js SPA; the rendered HTML doesn't contain skill slugs. Switched from HTML scraping to the live `/api/search` JSON endpoint.
+- Removed the guessed/curated slug fallback — returning non-existent `owner/repo` slugs caused `npx skills add` to fail with git clone errors. Now we return `[]` on API failure instead of fabricated slugs.
+- Pass `--yes --global` to the `skills` installer so it doesn't block on sub-prompts.
+
+## [0.1.0] — 2026-04-14
+
+### Added
+- Initial release.
+- Zero-config CLI `npx skillgrab` (alias `npx autoskills`) that scans any project and installs matching skills from skills.sh.
+- Detectors for JS/TS, Python, mobile (Flutter/iOS/Android), backend (Go/Rust/Ruby/PHP/Java/Elixir), and infra (Docker/Vercel/Netlify/Fly/Cloudflare/Terraform/GH Actions).
+- README-based context hints for non-code needs: marketing, SEO, design, product, sales, ops, analytics, content.
+- Flags: `--dry-run`, `--yes`, `--json`, `--help`, `--version`.
+- Bilingual (EN/ES) static landing page at [briascoi.github.io/skillgrab](https://briascoi.github.io/skillgrab/).
