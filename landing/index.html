@@ -47,6 +47,8 @@
     </a>
     <nav class="flex items-center gap-1 text-sm">
       <a href="#how" class="px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-white/5" data-i18n="nav_how">How it works</a>
+      <a href="#agents" class="px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-white/5" data-i18n="nav_agents">Agents</a>
+      <a href="#security" class="px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-white/5" data-i18n="nav_security">Security</a>
       <a href="#stacks" class="px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-white/5" data-i18n="nav_stacks">Stacks</a>
       <a href="https://skills.sh" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-white/5">skills.sh ↗</a>
       <div class="ml-2 flex items-center gap-1 rounded-md border border-white/10 bg-white/5 p-0.5 text-xs">
@@ -173,6 +175,98 @@
   </div>
 </section>
 
+<section id="agents" class="py-24 border-b border-white/5">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 mb-5">
+      <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+      <span data-i18n="new_badge">New in v0.4.0</span>
+    </div>
+    <h2 class="text-3xl md:text-4xl font-bold" data-i18n="agents_title">Works with every AI coding agent.</h2>
+    <p class="mt-3 text-slate-400 max-w-2xl" data-i18n="agents_sub">skillgrab auto-detects installed agents and installs skills to all of them at once. Override with <code class="mono text-slate-200">--agent</code>.</p>
+
+    <div class="mt-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-sm">
+      <div class="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-4 py-3 font-medium text-indigo-200">Claude Code</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">Cursor</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">Cline</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">Codex</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">Continue</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">Gemini CLI</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">Warp</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">Windsurf</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">GitHub Copilot</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">Roo</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">OpenCode</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">Goose</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">Aider</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">Amp</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">Qwen Code</div>
+      <div class="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-slate-400" data-i18n="agents_more">+ 25 more</div>
+    </div>
+
+    <div class="mt-10 rounded-xl border border-white/10 bg-slate-900/70 overflow-hidden">
+      <div class="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/60">
+        <span class="w-2.5 h-2.5 rounded-full bg-red-400/70"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-yellow-400/70"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-green-400/70"></span>
+        <span class="ml-3 text-xs text-slate-400 mono">~/my-saas</span>
+      </div>
+<pre class="mono text-[13px] leading-6 p-5 text-slate-200 overflow-x-auto"><span class="text-slate-500">$</span> npx skillgrab --agent claude-code,cursor,cline
+
+▸ Install plan
+  ★ supabase/agent-skills/supabase-postgres-best-practices
+  ★ clerk/skills/clerk-nextjs-patterns
+  ★ stripe/ai/stripe-best-practices
+
+▸ Installing
+  target agents: claude-code, cursor, cline
+  ✓ supabase-postgres-best-practices → claude-code
+  ✓ supabase-postgres-best-practices → cursor
+  ✓ supabase-postgres-best-practices → cline
+  ✓ ... </pre>
+    </div>
+  </div>
+</section>
+
+<section id="security" class="py-24 border-b border-white/5">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <div class="inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 mb-5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span data-i18n="sec_badge">Secure by default</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold" data-i18n="sec_title">You stay in control.</h2>
+        <p class="mt-4 text-slate-400" data-i18n="sec_sub">Skills run with full agent permissions, so skillgrab gives you the levers to vet before you install.</p>
+        <ul class="mt-6 space-y-3 text-slate-300 text-sm">
+          <li class="flex gap-3"><span class="text-emerald-400">✓</span><span data-i18n="sec_1">Trusted-owner ranking — Anthropic, Vercel, Supabase, Stripe, Clerk, OpenAI, Google, Cloudflare float to the top with a ★.</span></li>
+          <li class="flex gap-3"><span class="text-emerald-400">✓</span><span data-i18n="sec_2">GitHub validation drops stale/fake entries before you see them.</span></li>
+          <li class="flex gap-3"><span class="text-emerald-400">✓</span><span data-i18n="sec_3">Interactive multi-select — every skill confirmed before any install.</span></li>
+          <li class="flex gap-3"><span class="text-emerald-400">✓</span><span data-i18n="sec_4"><code class="mono text-slate-200">--only-trusted</code> locks the plan to an allowlist of known-good owners.</span></li>
+          <li class="flex gap-3"><span class="text-emerald-400">✓</span><span data-i18n="sec_5"><code class="mono text-slate-200">--dry-run</code> previews everything with zero side effects.</span></li>
+        </ul>
+      </div>
+      <div class="rounded-xl border border-white/10 bg-slate-900/70 overflow-hidden">
+        <div class="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-slate-900/60">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-400/70"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-yellow-400/70"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-green-400/70"></span>
+          <span class="ml-3 text-xs text-slate-400 mono">~/my-saas</span>
+        </div>
+<pre class="mono text-[13px] leading-6 p-5 text-slate-200 overflow-x-auto"><span class="text-slate-500">$</span> npx skillgrab --only-trusted
+
+  --only-trusted: kept 5 trusted, dropped 3 untrusted
+
+▸ Install plan
+  ★ anthropics/knowledge-work-plugins/draft-outreach
+  ★ vercel-labs/agent-skills/find-skills
+  ★ supabase/agent-skills/supabase-postgres-best-practices
+  ★ stripe/ai/stripe-best-practices
+  ★ clerk/skills/clerk-nextjs-patterns</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="py-24">
   <div class="max-w-3xl mx-auto px-6 text-center">
     <h2 class="text-3xl md:text-4xl font-bold" data-i18n="final_title">Stop hunting for skills. Ship faster.</h2>
@@ -226,6 +320,20 @@ const I18N = {
     final_title: "Stop hunting for skills. Ship faster.",
     final_sub: "One command. The right tools for your project, installed.",
     by: "built by",
+    nav_agents: "Agents",
+    nav_security: "Security",
+    new_badge: "New in v0.4.0",
+    agents_title: "Works with every AI coding agent.",
+    agents_sub: 'skillgrab auto-detects installed agents and installs skills to all of them at once. Override with <code class="mono text-slate-200">--agent</code>.',
+    agents_more: "+ 25 more",
+    sec_badge: "Secure by default",
+    sec_title: "You stay in control.",
+    sec_sub: "Skills run with full agent permissions, so skillgrab gives you the levers to vet before you install.",
+    sec_1: "Trusted-owner ranking — Anthropic, Vercel, Supabase, Stripe, Clerk, OpenAI, Google, Cloudflare float to the top with a ★.",
+    sec_2: "GitHub validation drops stale/fake entries before you see them.",
+    sec_3: "Interactive multi-select — every skill confirmed before any install.",
+    sec_4: '<code class="mono text-slate-200">--only-trusted</code> locks the plan to an allowlist of known-good owners.',
+    sec_5: '<code class="mono text-slate-200">--dry-run</code> previews everything with zero side effects.',
   },
   es: {
     nav_how: "Cómo funciona",
@@ -253,6 +361,20 @@ const I18N = {
     final_title: "Deja de buscar skills. Envía más rápido.",
     final_sub: "Un comando. Las herramientas correctas para tu proyecto, instaladas.",
     by: "hecho por",
+    nav_agents: "Agentes",
+    nav_security: "Seguridad",
+    new_badge: "Nuevo en v0.4.0",
+    agents_title: "Funciona con todos los agentes de IA.",
+    agents_sub: 'skillgrab auto-detecta los agentes instalados e instala las skills en todos de una sola vez. Override con <code class="mono text-slate-200">--agent</code>.',
+    agents_more: "+ 25 más",
+    sec_badge: "Seguro por default",
+    sec_title: "El control es tuyo.",
+    sec_sub: "Las skills corren con permisos totales del agente — skillgrab te da las palancas para revisar antes de instalar.",
+    sec_1: "Ranking por owner confiable — Anthropic, Vercel, Supabase, Stripe, Clerk, OpenAI, Google, Cloudflare se priorizan con ★.",
+    sec_2: "Validación contra GitHub descarta skills inexistentes antes de mostrártelas.",
+    sec_3: "Multi-select interactivo — confirmás cada skill antes de instalarla.",
+    sec_4: '<code class="mono text-slate-200">--only-trusted</code> restringe el plan a una allowlist de owners verificados.',
+    sec_5: '<code class="mono text-slate-200">--dry-run</code> previsualiza todo sin ningún efecto secundario.',
   },
 };
 
