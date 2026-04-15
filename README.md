@@ -248,6 +248,43 @@ npx skillgrab --only-trusted             # install trusted skills only
 
 ---
 
+## MCP server
+
+skillgrab exposes itself as an [MCP](https://modelcontextprotocol.io) server so Claude Desktop, Cursor, Cline, and other MCP-compatible agents can invoke it directly from chat — no terminal needed.
+
+**Tools exposed:**
+- `skillgrab_recommend` — scan a project and return a skill plan (read-only)
+- `skillgrab_install` — install a list of skills into target agent(s)
+- `skillgrab_status` — list installed skills with registry cross-reference
+
+**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+```json
+{
+  "mcpServers": {
+    "skillgrab": {
+      "command": "npx",
+      "args": ["skillgrab-mcp"]
+    }
+  }
+}
+```
+
+**Cursor** (`.cursor/mcp.json` or Settings → MCP):
+```json
+{
+  "mcpServers": {
+    "skillgrab": {
+      "command": "npx",
+      "args": ["skillgrab-mcp"]
+    }
+  }
+}
+```
+
+Once configured, ask your agent: *"What skills should I install for this project?"* — it will call `skillgrab_recommend`, show you the plan, and install on confirmation.
+
+---
+
 ## Environment
 
 | Var | Purpose |

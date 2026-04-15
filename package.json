@@ -1,11 +1,12 @@
 {
   "name": "skillgrab",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Scan any project and auto-install matching AI skills from skills.sh.",
   "type": "module",
   "bin": {
     "skillgrab": "dist/cli.js",
-    "autoskills": "dist/cli.js"
+    "autoskills": "dist/cli.js",
+    "skillgrab-mcp": "dist/mcp/server.js"
   },
   "repository": {
     "type": "git",
@@ -39,8 +40,10 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.7.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "picocolors": "^1.0.1",
-    "yaml": "^2.5.0"
+    "yaml": "^2.5.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",
