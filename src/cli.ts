@@ -7,6 +7,7 @@ import { detect } from "./detect/index.js";
 import { searchRegistry, scoreSkill } from "./registry/search.js";
 import type { ApiSkill } from "./registry/search.js";
 import { filterValid } from "./registry/validate.js";
+import { detectAgents } from "./agents.js";
 import { banner, info, ok, planTable, section, warn, err } from "./ui.js";
 import { confirmAreas, pickSkills } from "./prompt.js";
 import { installAll } from "./install.js";
@@ -24,6 +25,7 @@ type Args = {
   help: boolean;
   version: boolean;
   onlyTrusted: boolean;
+  agents: string[] | null; // null = auto-detect, [] = env override
   cwd: string;
 };
 
@@ -35,15 +37,23 @@ function parseArgs(argv: string[]): Args {
     help: false,
     version: false,
     onlyTrusted: false,
+    agents: null,
     cwd: process.cwd(),
   };
-  for (const arg of argv) {
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
     if (arg === "--dry-run" || arg === "-n") a.dryRun = true;
     else if (arg === "--yes" || arg === "-y") a.yes = true;
     else if (arg === "--json") a.json = true;
     else if (arg === "--help" || arg === "-h") a.help = true;
     else if (arg === "--version" || arg === "-v") a.version = true;
     else if (arg === "--only-trusted" || arg === "-t") a.onlyTrusted = true;
+    else if (arg === "--agent" || arg === "-a") {
+      const val = argv[++i];
+      if (val) a.agents = val.split(",").map((s) => s.trim()).filter(Boolean);
+    } else if (arg.startsWith("--agent=")) {
+      a.agents = arg.slice("--agent=".length).split(",").map((s) => s.trim()).filter(Boolean);
+    }
   }
   return a;
 }
@@ -55,21 +65,25 @@ Usage:
   npx skillgrab [options]
 
 Options:
-  -n, --dry-run       Show what would be installed, don't run installers
-  -y, --yes           Skip confirmation prompts
-  -t, --only-trusted  Restrict plan to skills from trusted owners only
-                      (anthropics, vercel, supabase, stripe, clerk, openai,
-                       microsoft, github, google, cloudflare, apify, …)
-      --json          Output the detection+plan as JSON and exit
-  -h, --help          Show this help
-  -v, --version       Show version
+  -n, --dry-run         Show what would be installed, don't run installers
+  -y, --yes             Skip confirmation prompts
+  -t, --only-trusted    Restrict plan to skills from trusted owners only
+  -a, --agent <list>    Target agent(s), comma-separated
+                        (e.g. -a cursor  or  -a claude-code,cursor,cline)
+                        If omitted, skillgrab auto-detects installed agents.
+                        Supports: claude-code, cursor, cline, codex, continue,
+                        gemini-cli, warp, windsurf, github-copilot, roo,
+                        opencode, goose, aider, amp, qwen-code, kilo, …
+      --json            Output detection+plan as JSON and exit
+  -h, --help            Show this help
+  -v, --version         Show version
 
 Security note: skills contain SKILL.md files that run with full agent
 permissions. Review candidates before installing. Use --only-trusted
 to restrict to a hardcoded allowlist of known-good owners.
 
 Env:
-  SKILLGRAB_AGENT      Target agent for install (default: claude-code)
+  SKILLGRAB_AGENT      Default agent(s), comma-separated. Overridden by --agent.
   AUTOSKILLS_REGISTRY  Override skills.sh base URL (for testing)
   GITHUB_TOKEN         Bypass 60/hr unauth GitHub API rate limit
 `;
@@ -202,6 +216,22 @@ async function main() {
     }
   }
 
+  // Resolve target agents: --agent flag > SKILLGRAB_AGENT env > auto-detect > claude-code fallback
+  let targetAgents: string[];
+  if (args.agents && args.agents.length > 0) {
+    targetAgents = args.agents;
+  } else if (process.env.SKILLGRAB_AGENT) {
+    targetAgents = process.env.SKILLGRAB_AGENT.split(",").map((s) => s.trim()).filter(Boolean);
+  } else {
+    const detected = await detectAgents();
+    targetAgents = detected.length > 0 ? detected : ["claude-code"];
+    if (!args.json && detected.length > 0) {
+      section("Detected agents");
+      info(detected.join(", "));
+      console.log("");
+    }
+  }
+
   if (args.json) {
     console.log(JSON.stringify({ detect: result, acceptedHints, plan: candidates }, null, 2));
     return;
@@ -228,7 +258,8 @@ async function main() {
   }
 
   section("Installing");
-  const results = await installAll(selected.map((c) => c.slug));
+  info(`target agents: ${targetAgents.join(", ")}`);
+  const results = await installAll(selected.map((c) => c.slug), targetAgents);
   console.log("");
   const failed = results.filter((r) => r.code !== 0);
   if (failed.length === 0) {

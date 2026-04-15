@@ -1,11 +1,9 @@
 import { spawn } from "node:child_process";
 
-const AGENT = process.env.SKILLGRAB_AGENT ?? "claude-code";
-
 /**
- * Split a skills.sh slug into (repo, skillId).
- * skills.sh returns `owner/repo/skillId` but `npx skills add` expects
- * `owner/repo` as the source and takes the specific skill via --skill.
+ * Split `owner/repo/skillId` into (repo, skillId).
+ * skills.sh returns full slugs but `npx skills add` expects
+ * owner/repo as source + skillId via --skill.
  */
 export function parseSlug(slug: string): { source: string; skillId: string | null } {
   const parts = slug.split("/").filter(Boolean);
@@ -23,36 +21,33 @@ function run(args: string[]): Promise<number> {
   });
 }
 
-async function installGroup(source: string, skillIds: string[]): Promise<number> {
-  const args = ["skills", "add", source, "--yes", "--global", "--agent", AGENT];
+function buildArgs(source: string, skillIds: string[], agents: string[]): string[] {
+  const args = ["skills", "add", source, "--yes", "--global"];
+  for (const agent of agents) args.push("--agent", agent);
   for (const id of skillIds) args.push("--skill", id);
-  return run(args);
+  return args;
 }
 
-export async function installOne(slug: string): Promise<number> {
+export async function installOne(slug: string, agents: string[] = ["claude-code"]): Promise<number> {
   const { source, skillId } = parseSlug(slug);
-  if (!skillId) return run(["skills", "add", source, "--yes", "--global", "--agent", AGENT]);
-  return installGroup(source, [skillId]);
+  const skillIds = skillId ? [skillId] : [];
+  return run(buildArgs(source, skillIds, agents));
 }
 
-export async function installAll(slugs: string[]): Promise<{ slug: string; code: number }[]> {
-  // Group by source repo → one clone per repo, multiple --skill flags.
+export async function installAll(
+  slugs: string[],
+  agents: string[] = ["claude-code"],
+): Promise<{ slug: string; code: number }[]> {
   const bySource = new Map<string, string[]>();
   for (const slug of slugs) {
     const { source, skillId } = parseSlug(slug);
-    if (!skillId) {
-      if (!bySource.has(source)) bySource.set(source, []);
-      continue;
-    }
     if (!bySource.has(source)) bySource.set(source, []);
-    bySource.get(source)!.push(skillId);
+    if (skillId) bySource.get(source)!.push(skillId);
   }
 
   const results: { slug: string; code: number }[] = [];
   for (const [source, skillIds] of bySource.entries()) {
-    const code = skillIds.length === 0
-      ? await run(["skills", "add", source, "--yes", "--global", "--agent", AGENT])
-      : await installGroup(source, skillIds);
+    const code = await run(buildArgs(source, skillIds, agents));
     if (skillIds.length === 0) {
       results.push({ slug: source, code });
     } else {

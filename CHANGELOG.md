@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.0] — 2026-04-15
+
+### Added
+- **Multi-agent support with auto-detection.** skillgrab now probes `~/.claude`, `~/.cursor`, `~/.cline`, `~/.codex`, `~/.continue`, `~/.gemini-cli`, `~/.warp`, `~/.codeium/windsurf`, and ~15 other agent config dirs, then installs each matched skill to every detected agent.
+- **`--agent` / `-a` flag** — explicit override, comma-separated: `--agent cursor` or `--agent claude-code,cursor,cline`.
+- `SKILLGRAB_AGENT` env var now accepts comma-separated list.
+- CLI shows "Detected agents: …" before building the plan when auto-detection kicks in.
+
+### Changed
+- Default behavior: if no `--agent` flag and no env var, skillgrab **auto-detects** installed agents. Falls back to `claude-code` only if none found. Previous behavior was always `claude-code`.
+
+### Why
+Multiple users asked whether skillgrab was Claude Code-only. Under the hood it was always multi-agent (via `npx skills add --agent`), but the default was `claude-code` and the flag wasn't exposed. Now it JFW.
+
 ## [0.3.0] — 2026-04-15
 
 ### Added

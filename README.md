@@ -25,12 +25,21 @@ skills.sh has 90,000+ skills. Picking the right ones for your project is manual 
 ## Usage
 
 ```bash
-npx skillgrab             # scan, confirm, install
-npx skillgrab --dry-run   # show what would be installed, don't install
-npx skillgrab --yes       # skip confirmation prompts
-npx skillgrab --json      # emit detection + plan as JSON
-npx skillgrab --help      # show all flags
+npx skillgrab                        # scan, confirm, install
+npx skillgrab --dry-run              # preview, don't install
+npx skillgrab --only-trusted         # restrict to allowlisted owners
+npx skillgrab --agent cursor         # target a specific agent
+npx skillgrab --agent claude-code,cursor,cline  # multi-agent
+npx skillgrab --yes                  # skip confirmation prompts
+npx skillgrab --json                 # emit detection + plan as JSON
+npx skillgrab --help                 # show all flags
 ```
+
+## Multi-agent
+
+skillgrab auto-detects installed AI coding agents on your machine (by probing `~/.claude`, `~/.cursor`, `~/.cline`, `~/.codex`, `~/.continue`, `~/.gemini-cli`, etc.) and installs the matching skills for **all of them** in one command. Override with `--agent <list>` or the `SKILLGRAB_AGENT` env var.
+
+Supports any agent that `npx skills add --agent` accepts (40+), including: claude-code, cursor, cline, codex, continue, gemini-cli, warp, windsurf, github-copilot, roo, opencode, goose, aider, amp, qwen-code, kilo, replit, trae.
 
 Also available as `npx autoskills` (alias bin).
 
@@ -38,7 +47,7 @@ Also available as `npx autoskills` (alias bin).
 
 | Var | Default | Purpose |
 |---|---|---|
-| `SKILLGRAB_AGENT` | `claude-code` | Target agent for install (see `npx skills add --help`) |
+| `SKILLGRAB_AGENT` | auto-detect | Target agent(s), comma-separated. Overridden by `--agent`. |
 | `AUTOSKILLS_REGISTRY` | `https://skills.sh` | Override registry base URL (testing) |
 | `GITHUB_TOKEN` | unset | Bypasses 60/hr unauth limit on the validation step |
 
