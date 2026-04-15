@@ -1,96 +1,176 @@
+<div align="center">
+
+<br />
+
+<img width="60" src="https://raw.githubusercontent.com/briascoi/skillgrab/main/landing/icon.svg" alt="skillgrab" />
+
 # skillgrab
 
 **One command. The right AI skills for your project.**
 
-[![npm version](https://img.shields.io/npm/v/skillgrab.svg?color=blue)](https://www.npmjs.com/package/skillgrab)
-[![npm downloads](https://img.shields.io/npm/dw/skillgrab.svg?color=green)](https://www.npmjs.com/package/skillgrab)
-[![license](https://img.shields.io/npm/l/skillgrab.svg)](./LICENSE)
-[![node](https://img.shields.io/node/v/skillgrab.svg)](https://nodejs.org)
-[![stars](https://img.shields.io/github/stars/briascoi/skillgrab?style=social)](https://github.com/briascoi/skillgrab)
+[![npm version](https://img.shields.io/npm/v/skillgrab.svg?color=6366f1&labelColor=0f172a&label=npm)](https://www.npmjs.com/package/skillgrab)
+[![npm downloads](https://img.shields.io/npm/dw/skillgrab.svg?color=10b981&labelColor=0f172a&label=weekly)](https://www.npmjs.com/package/skillgrab)
+[![license](https://img.shields.io/npm/l/skillgrab.svg?color=64748b&labelColor=0f172a)](./LICENSE)
+[![node](https://img.shields.io/node/v/skillgrab.svg?color=64748b&labelColor=0f172a)](https://nodejs.org)
+
+<br />
 
 ```bash
 npx skillgrab
 ```
 
-Zero config. `skillgrab` scans your project, detects your stack — frontend, backend, mobile, infra, plus non-code needs like marketing and design — and installs matching AI agent skills from [skills.sh](https://skills.sh) in one command.
+skillgrab scans your project, detects your stack — frontend, backend, mobile, infra, marketing — and installs the right AI agent skills from [skills.sh](https://skills.sh) in one command. Works with Claude Code, Cursor, Cline, Codex, and 40+ other agents.
 
-**Landing:** https://briascoi.github.io/skillgrab/
+<br />
 
-![demo](./landing/demo.gif)
+<a href="https://briascoi.github.io/skillgrab/">🌐 Landing page</a>
+&nbsp;·&nbsp;
+<a href="https://www.npmjs.com/package/skillgrab">📦 npm</a>
+&nbsp;·&nbsp;
+<a href="./CHANGELOG.md">📋 Changelog</a>
 
-## Why skillgrab
+<br />
 
-skills.sh has 90,000+ skills. Picking the right ones for your project is manual and error-prone — you end up with a bloated `~/.claude/skills` or nothing at all. skillgrab reads your `package.json`, `requirements.txt`, `Dockerfile`, and README, then installs only what fits.
+</div>
 
-## Usage
+---
+
+## What it does
+
+```
+$ npx skillgrab
+
+  skillgrab v0.5.0
+
+▸ Tech signals
+  next.js            package.json → next
+  tailwind           package.json → tailwindcss
+  supabase           package.json → @supabase/supabase-js
+  stripe             package.json → stripe
+  clerk              package.json → @clerk/nextjs
+
+▸ Install plan
+  ★ vercel-labs/agent-skills/find-skills          ← next.js    12.9k installs
+  ★ supabase/agent-skills/supabase-best-practices ← supabase   30.2k installs
+  ★ stripe/ai/stripe-best-practices               ← stripe      5.1k installs
+  ★ clerk/skills/clerk-nextjs-patterns            ← clerk       8.4k installs
+
+▸ Detected agents: claude-code, cursor
+
+  Installing to: claude-code, cursor
+  ✔ Installed 4 skills.
+```
+
+skills.sh has 90,000+ skills. Picking the right ones manually is tedious. skillgrab reads your `package.json`, `requirements.txt`, `Dockerfile`, and README, ranks by trust + popularity, validates against GitHub, and installs — all without any setup.
+
+---
+
+## Commands
+
+### `npx skillgrab` — install skills for your project
 
 ```bash
 npx skillgrab                        # scan, confirm, install
 npx skillgrab --dry-run              # preview, don't install
-npx skillgrab --only-trusted         # restrict to allowlisted owners
+npx skillgrab --only-trusted         # trusted owners only (anthropics, vercel, supabase…)
 npx skillgrab --agent cursor         # target a specific agent
-npx skillgrab --agent claude-code,cursor,cline  # multi-agent
-npx skillgrab --yes                  # skip confirmation prompts
-npx skillgrab --json                 # emit detection + plan as JSON
-npx skillgrab --help                 # show all flags
+npx skillgrab --agent claude-code,cursor,cline   # multi-agent
+npx skillgrab --yes                  # skip prompts
+npx skillgrab --json                 # output plan as JSON
 ```
 
-## Multi-agent
+### `npx skillgrab status` — see what you have installed
 
-skillgrab auto-detects installed AI coding agents on your machine (by probing `~/.claude`, `~/.cursor`, `~/.cline`, `~/.codex`, `~/.continue`, `~/.gemini-cli`, etc.) and installs the matching skills for **all of them** in one command. Override with `--agent <list>` or the `SKILLGRAB_AGENT` env var.
+```
+$ npx skillgrab status
 
-Supports any agent that `npx skills add --agent` accepts (40+), including: claude-code, cursor, cline, codex, continue, gemini-cli, warp, windsurf, github-copilot, roo, opencode, goose, aider, amp, qwen-code, kilo, replit, trae.
+▸ Installed skills (claude-code, cursor)
 
-Also available as `npx autoskills` (alias bin).
+  skill                          agents        registry    installs
+  ─────────────────────────────────────────────────────────────────
+  find-skills                    claude-code   ✔ found     12.9k
+  supabase-best-practices        claude-code   ✔ found     30.2k
+  stripe-best-practices          claude-code   ✔ found      5.1k
+  my-custom-workflow             claude-code   – missing   –
 
-### Environment
+  ✔ 3 of 4 skills found in registry.
+  Run `npx skillgrab update` to reinstall / refresh all skills.
+```
 
-| Var | Default | Purpose |
-|---|---|---|
-| `SKILLGRAB_AGENT` | auto-detect | Target agent(s), comma-separated. Overridden by `--agent`. |
-| `AUTOSKILLS_REGISTRY` | `https://skills.sh` | Override registry base URL (testing) |
-| `GITHUB_TOKEN` | unset | Bypasses 60/hr unauth limit on the validation step |
+Cross-references every installed skill against the live registry. Shows which are outdated or custom-only.
+
+### `npx skillgrab update` — refresh installed skills
+
+```bash
+npx skillgrab update                 # reinstall all registry-tracked skills
+npx skillgrab update --only-trusted  # restrict to trusted owners
+npx skillgrab update --agent cursor  # update for a specific agent
+npx skillgrab update --yes           # skip confirmation
+```
+
+Pulls the latest version of every skill from GitHub. Supports all the same flags as install.
+
+---
 
 ## How it works
 
 ```
- project dir  ─┬─ scan files ──────────┐
-               │  package.json, reqs,  │
-               │  pubspec, go.mod,     │
-               │  Dockerfile, README…  │
-               └─────────┬─────────────┘
-                         ▼
-                   detect signals
-                         │
-                         ▼
-           skills.sh /api/search (live)
-                         │
-                         ▼
-        rank + dedupe + trusted boost
-                         │
-                         ▼
-         GitHub trees API validation
-         (drop stale/nonexistent slugs)
-                         │
-                         ▼
-          interactive multi-select
-                         │
-                         ▼
-         npx skills add (grouped by repo,
-           one clone per repo, --skill flags)
+  project dir
+       │
+       ▼
+  scan files ──── package.json, requirements.txt,
+                  pubspec.yaml, go.mod, Dockerfile,
+                  Gemfile, composer.json, README…
+       │
+       ▼
+  detect signals (35+ stack detectors)
+       │
+       ▼
+  query skills.sh /api/search (live)
+       │
+       ▼
+  rank: trusted-owner boost + log₁₀(installs)
+       │
+       ▼
+  validate: GitHub Trees API (drop stale slugs)
+       │
+       ▼
+  interactive multi-select
+       │
+       ▼
+  npx skills add — grouped by repo, --skill flags,
+  one clone per repo, installs to all detected agents
 ```
 
-1. **Scan** — parallel file probes in the current directory.
-2. **Search** — queries `skills.sh/api/search` for each signal.
-3. **Rank** — score = trusted-owner boost (anthropics, vercel, supabase, stripe, clerk, openai, microsoft, google, …) + log10(installs).
-4. **Dedupe** — one skill per name (avoids overwrites in `~/.claude/skills/`).
-5. **Validate** — HEAD GitHub trees API to drop stale entries the search returns.
-6. **Install** — groups by source repo, one clone per repo, `--skill` flags.
+---
+
+## Multi-agent
+
+skillgrab auto-detects installed agents by probing their config dirs (`~/.claude`, `~/.cursor`, `~/.cline`, etc.) and installs skills to **all of them at once**.
+
+<table>
+<tr>
+<td><b>Claude Code</b></td><td>Cursor</td><td>Cline</td><td>Codex</td>
+</tr>
+<tr>
+<td>Continue</td><td>Gemini CLI</td><td>Warp</td><td>Windsurf</td>
+</tr>
+<tr>
+<td>GitHub Copilot</td><td>Roo</td><td>OpenCode</td><td>Goose</td>
+</tr>
+<tr>
+<td>Aider</td><td>Amp</td><td>Qwen Code</td><td>Kilo · Replit · Trae · …</td>
+</tr>
+</table>
+
+Override with `--agent <list>` or `SKILLGRAB_AGENT` env var.
+
+---
 
 ## Supported stacks
 
 <details>
-<summary><b>JavaScript / TypeScript</b> (click to expand)</summary>
+<summary><b>JavaScript / TypeScript</b></summary>
 
 React · Next.js · Vue · Nuxt · Angular · Svelte · SvelteKit · Astro · Remix · Solid
 · Tailwind · Chakra · MUI · styled-components
@@ -111,13 +191,13 @@ Django · Flask · FastAPI · Starlette · Pandas · NumPy · PyTorch · TensorF
 <details>
 <summary><b>Mobile</b></summary>
 
-Flutter (`pubspec.yaml`) · Swift (`Package.swift`, `.xcodeproj`) · Android / Kotlin (Gradle)
+Flutter (pubspec.yaml) · Swift (Package.swift, .xcodeproj) · Android / Kotlin (Gradle)
 </details>
 
 <details>
 <summary><b>Backend</b></summary>
 
-Go (`go.mod`) · Rust (`Cargo.toml`) · Ruby + Rails (`Gemfile`) · PHP + Laravel (`composer.json`) · Java / JVM (`pom.xml`, `build.gradle`) · Elixir / Phoenix (`mix.exs`)
+Go (go.mod) · Rust (Cargo.toml) · Ruby + Rails (Gemfile) · PHP + Laravel (composer.json) · Java / JVM (pom.xml, build.gradle) · Elixir / Phoenix (mix.exs)
 </details>
 
 <details>
@@ -127,47 +207,56 @@ Docker · docker-compose · Vercel · Netlify · Fly.io · Render · Cloudflare 
 </details>
 
 <details>
-<summary><b>Non-code (detected from README/docs)</b></summary>
+<summary><b>Non-code (detected from README)</b></summary>
 
 Marketing · Copywriting · SEO · Design · Figma · Branding · Product management · Sales · Outreach · Operations · Analytics · Content strategy · Social
 </details>
 
-## Alternatives
-
-| | skillgrab | `npx skills find` | `npx skills add` manually |
-|---|---|---|---|
-| Detects your stack | ✅ | ❌ | ❌ |
-| Reads README for non-code needs | ✅ | ❌ | ❌ |
-| Validates against GitHub before install | ✅ | ❌ | ❌ |
-| Dedupes by skill name | ✅ | ❌ | ❌ |
-| One command, zero config | ✅ | partial | ❌ |
-| Works alongside `npx skills` | uses it | — | — |
+---
 
 ## Security
 
-Skills are `SKILL.md` files that execute with **full agent tool permissions** — they can read/write files, run shell commands, and make network calls through whatever agent loads them (Claude Code, Cursor, etc.). Treat a skill like an npm dependency: vet before you install.
+Skills are `SKILL.md` files that execute with **full agent tool permissions** — they can read/write files, run shell commands, and make network calls. Treat a skill like an npm dependency: vet before you install.
 
-What skillgrab does to reduce surface area:
-
-- **Trusted-owner ranking (★)** — skills from anthropics, vercel, vercel-labs, supabase, stripe, clerk, openai, microsoft, github, google, googleworkspace, cloudflare, apify, and openclaudia are boosted in the plan and marked with a star.
-- **`--only-trusted` flag** — restricts the install plan to the trusted allowlist above. Drops everything else.
-- **GitHub Trees validation** — each candidate's `<skillId>/SKILL.md` path is verified to actually exist before presenting, so typosquatted or fuzzy-match results from skills.sh's search don't leak into the plan.
-- **Interactive multi-select** — every skill is shown as `owner/repo/skill` and pre-selected; nothing runs until you confirm.
-- **`--dry-run`** — previews the full plan with zero side effects.
-
-What skillgrab does **not** do (yet):
-
-- Scan `SKILL.md` content for prompt-injection patterns. Content-level safety is an open problem for every agent-skill ecosystem; I'd rather ship the flag above than a false sense of security.
-- Cryptographically verify skills. No signatures exist in the ecosystem today.
-
-Recommended defaults for production / untrusted projects:
+| What skillgrab does | |
+|---|---|
+| **Trusted-owner ranking (★)** | Skills from anthropics, vercel, vercel-labs, supabase, stripe, clerk, openai, microsoft, github, google, cloudflare, apify, openclaudia are boosted and marked ★ |
+| **`--only-trusted` flag** | Restricts the plan to the allowlist above, drops everything else |
+| **GitHub validation** | Every candidate's `skillId/SKILL.md` verified to exist before presenting — no stale or typosquatted entries |
+| **Interactive multi-select** | Nothing installs until you confirm each skill |
+| **`--dry-run`** | Full plan preview, zero side effects |
 
 ```bash
-npx skillgrab --only-trusted --dry-run    # preview only trusted skills
-npx skillgrab --only-trusted              # install only trusted skills
+# Recommended for production / untrusted projects
+npx skillgrab --only-trusted --dry-run   # preview trusted skills only
+npx skillgrab --only-trusted             # install trusted skills only
 ```
 
-If you find an actively malicious skill on skills.sh, report it to them and open an issue here so I can consider adding owner-level blocklisting.
+---
+
+## vs. the alternatives
+
+| | skillgrab | `npx skills find` | `npx skills add` manually |
+|---|:---:|:---:|:---:|
+| Auto-detects your stack | ✅ | ❌ | ❌ |
+| Reads README for non-code needs | ✅ | ❌ | ❌ |
+| Validates against GitHub | ✅ | ❌ | ❌ |
+| Dedupes by skill name | ✅ | ❌ | ❌ |
+| Installs to all agents at once | ✅ | ❌ | ❌ |
+| `status` + `update` subcommands | ✅ | ❌ | ❌ |
+| Zero config | ✅ | partial | ❌ |
+
+---
+
+## Environment
+
+| Var | Purpose |
+|---|---|
+| `SKILLGRAB_AGENT` | Default agent(s), comma-separated. Overridden by `--agent`. |
+| `AUTOSKILLS_REGISTRY` | Override skills.sh base URL (for testing) |
+| `GITHUB_TOKEN` | Bypass the 60/hr unauth GitHub API rate limit on validation |
+
+---
 
 ## Development
 
@@ -179,14 +268,18 @@ npm run build
 node dist/cli.js --dry-run
 ```
 
-## Changelog
+Stack detectors live in `src/detect/`. Add a file there and wire it into `src/detect/index.ts` to add a new stack.
 
-See [CHANGELOG.md](./CHANGELOG.md).
+---
 
 ## Contributing
 
-PRs welcome — especially new stack detectors. Add a file under `src/detect/` and reference it from `src/detect/index.ts`.
+PRs welcome — especially new stack detectors. Open an issue first for anything substantial.
 
-## License
+---
 
-[MIT](./LICENSE) · built by [Ismael Briasco](https://github.com/briascoi) (@briascoi)
+<div align="center">
+
+[MIT](./LICENSE) · built by [Ismael Briasco](https://github.com/briascoi) · [@briascoi](https://github.com/briascoi)
+
+</div>

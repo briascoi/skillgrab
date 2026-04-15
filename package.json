@@ -4,8 +4,8 @@
   "description": "Scan any project and auto-install matching AI skills from skills.sh.",
   "type": "module",
   "bin": {
-    "skillgrab": "./dist/cli.js",
-    "autoskills": "./dist/cli.js"
+    "skillgrab": "dist/cli.js",
+    "autoskills": "dist/cli.js"
   },
   "repository": {
     "type": "git",
