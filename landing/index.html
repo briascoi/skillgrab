@@ -5,8 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>skillgrab — one command, the right AI skills for your project</title>
 <meta name="description" content="Scan any project and auto-install matching AI skills from skills.sh. Zero config. One command." />
+<meta name="author" content="Ismael Briasco (@briascoi)" />
 <meta property="og:title" content="skillgrab" />
 <meta property="og:description" content="One command. The right AI skills for your project." />
+<meta property="og:url" content="https://briascoi.github.io/skillgrab/" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="skillgrab — one command, the right AI skills for your project" />
+<meta name="twitter:description" content="Scan any project and auto-install matching AI skills from skills.sh. Zero config." />
+<meta name="twitter:creator" content="@briascoi" />
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -70,6 +77,12 @@
       <a href="#how" class="px-4 py-2 rounded-md bg-white text-slate-900 font-medium hover:bg-slate-100" data-i18n="cta_primary">See how it works</a>
       <a href="https://github.com/briascoi/skillgrab" target="_blank" rel="noopener" class="px-4 py-2 rounded-md border border-white/10 bg-white/5 hover:bg-white/10" data-i18n="cta_secondary">GitHub</a>
     </div>
+    <p class="mt-8 text-sm text-slate-500">
+      <span data-i18n="by">built by</span>
+      <a href="https://github.com/briascoi" target="_blank" rel="noopener" class="text-slate-300 hover:text-white font-medium">Ismael Briasco</a>
+      <span class="text-slate-600">·</span>
+      <a href="https://github.com/briascoi" target="_blank" rel="noopener" class="text-slate-500 hover:text-slate-300">@briascoi</a>
+    </p>
   </section>
 </header>
 
@@ -165,8 +178,12 @@
 
 <footer class="border-t border-white/5 py-8 text-sm text-slate-500">
   <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-    <div>© 2026 skillgrab · MIT</div>
+    <div>
+      © 2026 skillgrab · MIT · built by
+      <a href="https://github.com/briascoi" target="_blank" rel="noopener" class="text-slate-300 hover:text-white underline underline-offset-2 decoration-slate-600">Ismael Briasco</a>
+    </div>
     <div class="flex gap-4">
+      <a href="https://www.npmjs.com/package/skillgrab" target="_blank" rel="noopener" class="hover:text-slate-300">npm</a>
       <a href="https://skills.sh" target="_blank" rel="noopener" class="hover:text-slate-300">skills.sh</a>
       <a href="https://github.com/briascoi/skillgrab" target="_blank" rel="noopener" class="hover:text-slate-300">GitHub</a>
     </div>
@@ -200,6 +217,7 @@ const I18N = {
     stack_ops: "Product · Sales · Ops · Analytics",
     final_title: "Stop hunting for skills. Ship faster.",
     final_sub: "One command. The right tools for your project, installed.",
+    by: "built by",
   },
   es: {
     nav_how: "Cómo funciona",
@@ -226,6 +244,7 @@ const I18N = {
     stack_ops: "Producto · Ventas · Ops · Analítica",
     final_title: "Deja de buscar skills. Envía más rápido.",
     final_sub: "Un comando. Las herramientas correctas para tu proyecto, instaladas.",
+    by: "hecho por",
   },
 };
 
