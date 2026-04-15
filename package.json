@@ -43,7 +43,9 @@
     "yaml": "^2.5.0"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@types/node": "^20.14.0",
+    "satori": "^0.26.0",
     "typescript": "^5.5.0"
   }
 }

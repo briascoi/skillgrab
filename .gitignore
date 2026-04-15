@@ -3,3 +3,4 @@ dist
 .DS_Store
 *.log
 LAUNCH.md
+landing/demo.cast

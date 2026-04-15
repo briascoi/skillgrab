@@ -10,9 +10,13 @@
 <meta property="og:description" content="One command. The right AI skills for your project." />
 <meta property="og:url" content="https://briascoi.github.io/skillgrab/" />
 <meta property="og:type" content="website" />
+<meta property="og:image" content="https://briascoi.github.io/skillgrab/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="skillgrab — one command, the right AI skills for your project" />
 <meta name="twitter:description" content="Scan any project and auto-install matching AI skills from skills.sh. Zero config." />
+<meta name="twitter:image" content="https://briascoi.github.io/skillgrab/og.png" />
 <meta name="twitter:creator" content="@briascoi" />
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -83,6 +87,10 @@
       <span class="text-slate-600">·</span>
       <a href="https://github.com/briascoi" target="_blank" rel="noopener" class="text-slate-500 hover:text-slate-300">@briascoi</a>
     </p>
+
+    <div class="mt-12 flex justify-center">
+      <img src="demo.gif" alt="skillgrab demo" loading="lazy" class="rounded-xl border border-white/10 shadow-2xl max-w-3xl w-full" />
+    </div>
   </section>
 </header>
 
@@ -271,6 +279,19 @@ applyLang(saved || browser);
 document.querySelectorAll("[data-lang]").forEach((btn) => {
   btn.addEventListener("click", () => applyLang(btn.getAttribute("data-lang")));
 });
+
+// GoatCounter analytics — set window.SKILLGRAB_GC = "https://YOUR-CODE.goatcounter.com/count"
+// after creating an account at https://www.goatcounter.com/signup (free, no cookies).
+// To enable, replace the line below with your actual GoatCounter URL.
+(function() {
+  var gc = "https://skillgrab.goatcounter.com/count";
+  if (!gc) return;
+  var s = document.createElement("script");
+  s.async = true;
+  s.dataset.goatcounter = gc;
+  s.src = "//gc.zgo.at/count.js";
+  document.body.appendChild(s);
+})();
 
 document.getElementById("copy")?.addEventListener("click", async (e) => {
   try {
