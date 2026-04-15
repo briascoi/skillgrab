@@ -11,6 +11,8 @@ import { detectAgents } from "./agents.js";
 import { banner, info, ok, planTable, section, warn, err } from "./ui.js";
 import { confirmAreas, pickSkills } from "./prompt.js";
 import { installAll } from "./install.js";
+import { runStatus } from "./commands/status.js";
+import { runUpdate } from "./commands/update.js";
 import type { ContextHint, SkillCandidate, Signal } from "./types.js";
 
 const TRUSTED_OWNERS = new Set([
@@ -18,19 +20,23 @@ const TRUSTED_OWNERS = new Set([
   "microsoft","github","google","googleworkspace","cloudflare","apify","openclaudia",
 ]);
 
+const SUBCOMMANDS = new Set(["status", "update", "add"]);
+
 type Args = {
+  subcommand: "add" | "status" | "update";
   dryRun: boolean;
   yes: boolean;
   json: boolean;
   help: boolean;
   version: boolean;
   onlyTrusted: boolean;
-  agents: string[] | null; // null = auto-detect, [] = env override
+  agents: string[] | null; // null = auto-detect
   cwd: string;
 };
 
 function parseArgs(argv: string[]): Args {
   const a: Args = {
+    subcommand: "add",
     dryRun: false,
     yes: false,
     json: false,
@@ -40,7 +46,15 @@ function parseArgs(argv: string[]): Args {
     agents: null,
     cwd: process.cwd(),
   };
-  for (let i = 0; i < argv.length; i++) {
+
+  let i = 0;
+  // First positional arg may be a subcommand
+  if (argv[0] && !argv[0].startsWith("-") && SUBCOMMANDS.has(argv[0])) {
+    a.subcommand = argv[0] as Args["subcommand"];
+    i = 1;
+  }
+
+  for (; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--dry-run" || arg === "-n") a.dryRun = true;
     else if (arg === "--yes" || arg === "-y") a.yes = true;
@@ -62,7 +76,9 @@ const HELP = `
 skillgrab — detect your stack, install matching skills from skills.sh
 
 Usage:
-  npx skillgrab [options]
+  npx skillgrab [add] [options]   Scan project + install skills (default)
+  npx skillgrab status  [options] List installed skills + registry status
+  npx skillgrab update  [options] Reinstall/refresh all installed skills
 
 Options:
   -n, --dry-run         Show what would be installed, don't run installers
@@ -74,7 +90,7 @@ Options:
                         Supports: claude-code, cursor, cline, codex, continue,
                         gemini-cli, warp, windsurf, github-copilot, roo,
                         opencode, goose, aider, amp, qwen-code, kilo, …
-      --json            Output detection+plan as JSON and exit
+      --json            Output detection+plan as JSON and exit (add only)
   -h, --help            Show this help
   -v, --version         Show version
 
@@ -158,6 +174,22 @@ async function main() {
     return;
   }
 
+  // Dispatch to subcommands
+  if (args.subcommand === "status") {
+    await runStatus({ version, agents: args.agents });
+    return;
+  }
+  if (args.subcommand === "update") {
+    await runUpdate({
+      version,
+      agents: args.agents,
+      onlyTrusted: args.onlyTrusted,
+      yes: args.yes,
+    });
+    return;
+  }
+
+  // Default: add flow
   if (!args.json) banner(version);
 
   const spinner = args.json ? null : p.spinner();

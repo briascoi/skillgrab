@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.5.0] — 2026-04-15
+
+### Added
+- **`skillgrab status` subcommand.** Scans `~/.claude/skills/`, `~/.cursor/skills/`, and 18 other agent skill dirs. Cross-references each installed skill against skills.sh and prints a table: skill name · agents · registry status (✔ found / – missing) · install count. Shows which skills are custom/private vs registry-tracked.
+- **`skillgrab update` subcommand.** Reinstalls all skills that are found in the registry, pulling fresh copies from GitHub. Supports `--only-trusted` and `--agent` flags, same UX as the default install flow.
+- **Subcommand routing in CLI.** First positional argument is now treated as a subcommand (`status`, `update`, `add`). No subcommand = default `add` flow (backwards compatible).
+- Updated help text with subcommand usage.
+
+### Why
+Converting skillgrab from a one-shot installer to a tool people run monthly. `status` shows what you have; `update` keeps it fresh. Together they create a recurring usage loop.
+
 ## [0.4.0] — 2026-04-15
 
 ### Added
