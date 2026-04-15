@@ -134,6 +134,32 @@ Marketing · Copywriting · SEO · Design · Figma · Branding · Product manage
 | One command, zero config | ✅ | partial | ❌ |
 | Works alongside `npx skills` | uses it | — | — |
 
+## Security
+
+Skills are `SKILL.md` files that execute with **full agent tool permissions** — they can read/write files, run shell commands, and make network calls through whatever agent loads them (Claude Code, Cursor, etc.). Treat a skill like an npm dependency: vet before you install.
+
+What skillgrab does to reduce surface area:
+
+- **Trusted-owner ranking (★)** — skills from anthropics, vercel, vercel-labs, supabase, stripe, clerk, openai, microsoft, github, google, googleworkspace, cloudflare, apify, and openclaudia are boosted in the plan and marked with a star.
+- **`--only-trusted` flag** — restricts the install plan to the trusted allowlist above. Drops everything else.
+- **GitHub Trees validation** — each candidate's `<skillId>/SKILL.md` path is verified to actually exist before presenting, so typosquatted or fuzzy-match results from skills.sh's search don't leak into the plan.
+- **Interactive multi-select** — every skill is shown as `owner/repo/skill` and pre-selected; nothing runs until you confirm.
+- **`--dry-run`** — previews the full plan with zero side effects.
+
+What skillgrab does **not** do (yet):
+
+- Scan `SKILL.md` content for prompt-injection patterns. Content-level safety is an open problem for every agent-skill ecosystem; I'd rather ship the flag above than a false sense of security.
+- Cryptographically verify skills. No signatures exist in the ecosystem today.
+
+Recommended defaults for production / untrusted projects:
+
+```bash
+npx skillgrab --only-trusted --dry-run    # preview only trusted skills
+npx skillgrab --only-trusted              # install only trusted skills
+```
+
+If you find an actively malicious skill on skills.sh, report it to them and open an issue here so I can consider adding owner-level blocklisting.
+
 ## Development
 
 ```bash

@@ -23,6 +23,7 @@ type Args = {
   json: boolean;
   help: boolean;
   version: boolean;
+  onlyTrusted: boolean;
   cwd: string;
 };
 
@@ -33,6 +34,7 @@ function parseArgs(argv: string[]): Args {
     json: false,
     help: false,
     version: false,
+    onlyTrusted: false,
     cwd: process.cwd(),
   };
   for (const arg of argv) {
@@ -41,6 +43,7 @@ function parseArgs(argv: string[]): Args {
     else if (arg === "--json") a.json = true;
     else if (arg === "--help" || arg === "-h") a.help = true;
     else if (arg === "--version" || arg === "-v") a.version = true;
+    else if (arg === "--only-trusted" || arg === "-t") a.onlyTrusted = true;
   }
   return a;
 }
@@ -52,14 +55,23 @@ Usage:
   npx skillgrab [options]
 
 Options:
-  -n, --dry-run    Show what would be installed, don't run installers
-  -y, --yes        Skip confirmation prompts
-      --json       Output the detection+plan as JSON and exit
-  -h, --help       Show this help
-  -v, --version    Show version
+  -n, --dry-run       Show what would be installed, don't run installers
+  -y, --yes           Skip confirmation prompts
+  -t, --only-trusted  Restrict plan to skills from trusted owners only
+                      (anthropics, vercel, supabase, stripe, clerk, openai,
+                       microsoft, github, google, cloudflare, apify, …)
+      --json          Output the detection+plan as JSON and exit
+  -h, --help          Show this help
+  -v, --version       Show version
+
+Security note: skills contain SKILL.md files that run with full agent
+permissions. Review candidates before installing. Use --only-trusted
+to restrict to a hardcoded allowlist of known-good owners.
 
 Env:
+  SKILLGRAB_AGENT      Target agent for install (default: claude-code)
   AUTOSKILLS_REGISTRY  Override skills.sh base URL (for testing)
+  GITHUB_TOKEN         Bypass 60/hr unauth GitHub API rate limit
 `;
 
 async function readPkgVersion(): Promise<string> {
@@ -173,12 +185,22 @@ async function main() {
 
   const verifySpinner = args.json ? null : p.spinner();
   verifySpinner?.start("Verifying skills exist on GitHub");
-  const { valid: candidates, invalid } = await filterValid(rawCandidates);
+  const { valid: verified, invalid } = await filterValid(rawCandidates);
   verifySpinner?.stop(
     invalid.length > 0
-      ? `Verified ${candidates.length} · dropped ${invalid.length} stale entries`
-      : `Verified ${candidates.length} skills`,
+      ? `Verified ${verified.length} · dropped ${invalid.length} stale entries`
+      : `Verified ${verified.length} skills`,
   );
+
+  // --only-trusted: filter to allowlisted owners only
+  let candidates = verified;
+  if (args.onlyTrusted) {
+    const untrusted = verified.filter((c) => !c.trusted).length;
+    candidates = verified.filter((c) => c.trusted);
+    if (!args.json) {
+      info(`--only-trusted: kept ${candidates.length} trusted, dropped ${untrusted} untrusted`);
+    }
+  }
 
   if (args.json) {
     console.log(JSON.stringify({ detect: result, acceptedHints, plan: candidates }, null, 2));

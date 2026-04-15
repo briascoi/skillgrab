@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.3.0] — 2026-04-15
+
+### Added
+- **`--only-trusted` / `-t` flag** — restricts the install plan to skills from an allowlist of trusted owners: anthropics, vercel, vercel-labs, supabase, stripe, clerk, openai, microsoft, github, google, googleworkspace, cloudflare, apify, openclaudia. Drops everything else before presenting the plan.
+- **README "Security" section** — documents the threat model (SKILL.md files run with full agent permissions), what skillgrab does to reduce surface area, and what it doesn't do yet.
+- Help text now explicitly mentions the security note and points to `--only-trusted`.
+
+### Why
+After community feedback on Reddit raising (fairly) that blind install from a community registry is a risk vector, added an explicit lever to lock down to known-good sources. Content-level scanning is deferred — it's an unsolved problem ecosystem-wide.
+
 ## [0.2.3] — 2026-04-15
 
 ### Added
