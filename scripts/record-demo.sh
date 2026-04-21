@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
-# Record an asciinema demo of skillgrab on a fixture project. Convert to GIF.
+# Record an asciinema demo of skillgrab on a fixture project. Convert to GIF + MP4.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 FIX="/tmp/skillgrab-demo-fixture"
 CAST="$ROOT/landing/demo.cast"
 GIF="$ROOT/landing/demo.gif"
+MP4="$ROOT/landing/demo.mp4"
 INNER="/tmp/skillgrab-demo-inner.sh"
 
+# Build first
+echo "Building skillgrab..."
+cd "$ROOT" && npm run build --silent
+
+# Create fixture project
 mkdir -p "$FIX"
-cat > "$FIX/package.json" <<'EOF'
+cat > "$FIX/package.json" <<'FIXTURE'
 {
   "name": "my-saas",
   "description": "SaaS with landing page, pricing, SEO and newsletter",
@@ -18,17 +24,21 @@ cat > "$FIX/package.json" <<'EOF'
     "react": "^18",
     "tailwindcss": "^3",
     "@supabase/supabase-js": "^2",
-    "stripe": "^14"
+    "stripe": "^14",
+    "@clerk/nextjs": "^5",
+    "typescript": "^5"
   }
 }
-EOF
-cat > "$FIX/README.md" <<'EOF'
+FIXTURE
+cat > "$FIX/README.md" <<'FIXTURE'
 # My SaaS
 Landing page, waitlist, pricing. Focus on SEO and launch growth.
-EOF
+FIXTURE
 echo '{}' > "$FIX/vercel.json"
+echo '{ "compilerOptions": { "strict": true } }' > "$FIX/tsconfig.json"
 
-cat > "$INNER" <<EOF
+# Inner script that asciinema records
+cat > "$INNER" <<SCRIPT
 #!/usr/bin/env bash
 cd $FIX
 clear
@@ -39,12 +49,23 @@ sleep 1
 node $ROOT/dist/cli.js --dry-run --yes
 echo ""
 sleep 3
-EOF
+SCRIPT
 chmod +x "$INNER"
 
-TERM=xterm-256color asciinema rec --overwrite --quiet --cols 100 --rows 28 -c "$INNER" "$CAST"
+# Record
+echo "Recording..."
+TERM=xterm-256color asciinema rec --overwrite --quiet --cols 100 --rows 32 -c "$INNER" "$CAST"
 
-agg --theme monokai --speed 1.3 --cols 100 --rows 28 "$CAST" "$GIF"
+# Convert to GIF
+echo "Converting to GIF..."
+agg --theme monokai --speed 1.3 --cols 100 --rows 32 "$CAST" "$GIF"
 
-echo "Wrote: $CAST ($(wc -c < "$CAST") bytes)"
-echo "Wrote: $GIF ($(wc -c < "$GIF") bytes)"
+# Convert to MP4
+echo "Converting to MP4..."
+ffmpeg -y -i "$GIF" -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" "$MP4" 2>/dev/null
+
+echo ""
+echo "Done!"
+echo "  $CAST  ($(wc -c < "$CAST" | tr -d ' ') bytes)"
+echo "  $GIF   ($(wc -c < "$GIF" | tr -d ' ') bytes)"
+echo "  $MP4   ($(wc -c < "$MP4" | tr -d ' ') bytes)"
